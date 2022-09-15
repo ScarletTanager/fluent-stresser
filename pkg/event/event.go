@@ -12,6 +12,11 @@ const (
 	MAX_FIELDNAME_LEN = 15
 )
 
+// NewEventFactory returns a pointer to a new and fully configured factory instance,
+// and the instance can be used for event generation.
+// The arguments are the number of fields (other than the timestamp, which is added
+// automatically, and which should therefore not be included in this count),
+// the minimum length of field values, and the maximum length of field values.
 func NewEventFactory(numFields, minFieldLen, maxFieldLen int) *EventFactory {
 	factory := &EventFactory{
 		NumFields:   numFields,
@@ -32,6 +37,7 @@ type EventFactory struct {
 	EventType   reflect.Type
 }
 
+// Init initializes the factory with the actual struct type used for event generation
 func (f *EventFactory) Init() {
 	names := GenerateFieldNames(f.NumFields)
 	fields := make([]reflect.StructField, len(names)+1)
@@ -52,6 +58,7 @@ func (f *EventFactory) Init() {
 	f.EventType = reflect.StructOf(fields)
 }
 
+// NewEvent returns a new event as a byte slice
 func (f *EventFactory) NewEvent() []byte {
 	alphaNum := []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 
@@ -76,6 +83,9 @@ func (f *EventFactory) NewEvent() []byte {
 	return b
 }
 
+// GenerateFieldNames generates a slice of random strings to be used as the names of
+// fields.  Each name is at least MIN_FIELDNAME_LEN characters long and at most
+// MAX_FIELDNAME_LEN characters long.
 func GenerateFieldNames(numFields int) []string {
 	alphabet := []rune("abcdefghijklmnopqrstuvwxyz")
 	upper := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
